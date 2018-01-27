@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+    <!-- Add your EJS code here -->
+  <header>
+    <% include partials/_header %>
+  </header>
+  <main>
+    <h2>Shortened Urls</h2>
+    <ul>
+      <% for (urlFound in urls) { %>
+      <li><%= urlFound + ": " + urls[urlFound] %></li>
+      <form method="POST" action="/urls/<%=urlFound%>/delete">
+        <input type="submit" value="DELETE">
+      </form>
+      <form method="GET" action="/urls/<%=urlFound%>">
+        <input type="submit" value="EDIT">
+      </form>
+      <% } %>
+    </ul>
+    <h3>Click to shorten new URL <a href= ></a></h3>
+  </main>  
+</body>
+</html>
