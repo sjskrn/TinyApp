@@ -1,27 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>TinyApp</title>
+    <% include ./partials/_head %>
 </head>
 <body>
-    <!-- Add your EJS code here -->
   <header>
-    <% include partials/_header %>
+    <% include ./partials/_header %>
   </header>
-  <main>
-    <h2>Shortened Urls</h2>
-    <ul>
-      <% for (urlFound in urls) { %>
-      <li><%= urlFound + ": " + urls[urlFound] %></li>
-      <form method="POST" action="/urls/<%=urlFound%>/delete">
-        <input type="submit" value="DELETE">
-      </form>
-      <form method="GET" action="/urls/<%=urlFound%>">
-        <input type="submit" value="EDIT">
-      </form>
-      <% } %>
-    </ul>
-    <h3>Click to shorten new URL <a href= ></a></h3>
-  </main>  
+    <table>
+      <thead>
+        <tr>
+          <th>Short URL</th>
+          <th>Long URL</th>
+          <th> </th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (key in urlDatabase) {%>
+        <tr>
+          <td><%= key %></td>
+          <td><%= urlDatabase[key] %></td>
+          <td><form method="POST" action="/urls/<%= key %>/delete"><a href="/urls/<%= key %>">Edit</a><button name="button">Delete</button></form></td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+    <a href="/urls/new">Shorten another URL</a>
+<footer>
+    <% include ./partials/_footer %>
+</footer>
 </body>
 </html>
