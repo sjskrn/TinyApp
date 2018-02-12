@@ -2,8 +2,13 @@ const express = require("express");
 const bcrypt = require("bcrypt")
 const cookieParser = require('cookie-parser');
 const app = express();
+const cookieSession = require('cookie-session');
 
-app.use(cookieParser());
+
+app.use(cookieSession({
+  name: 'session',
+  keys: [process.env.SECRET_KEY || 'dev']
+}));
 
 const PORT = process.env.PORT || 8080;
 
@@ -15,6 +20,71 @@ app.set("view engine", "ejs");
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
+};
+
+// const users = {
+//   "Jazz": {
+//     username: "Jazz",
+//     email: "Jazz@gmail.com",
+//     password: bcrypt.hashSync("hack3r", 10)
+//     // password: "pur"
+//   },
+//   "test": {
+//     username: "test",
+//     email: "test@gmail.com",
+//     password: bcrypt.hashSync("password", 10)
+//   }
+// };
+
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
+
+let templateVars = {
+  urlDatabase: urlDatabase,
+  username: null
+};
+
+console.log('templateVars:', templateVars);
+console.log('user:', users);
+
+function doesUserEmailExist(email) {
+  for (let user in users) {
+    //console.log('users[user]["email"]: ', users[user]['email']);
+    if (users[user]['email'] === email) {
+    //console.log('doesUserEmailExist: ', email);
+    return true;
+    }
+  }
+  false;
+}
+
+function isUserPasswordValid(password) {
+  for (let user in users) {
+    console.log('users[user]["password"]: ', users[user]['password']);
+    if (users[user]['password'] === password) {
+    console.log('isUserPasswordValid: ', password);
+    return true;
+    }
+  }
+  false;
+}
+
+const userChecker = (currentUser) => {
+  for (let user in users) {
+    if (user === currentUser) {
+      return true;
+    }
+  } return false;
 };
 
 app.listen(PORT, () => {
@@ -30,47 +100,58 @@ function generateRandomString() {
 }
 
 app.get("/", (req, res) => {
-  let templateVars = {
-    username: req.cookies["username"],
-    urlDatabase: urlDatabase
-  };
-  res.render("main", templateVars);
+  let templateVars = { urlDatabase: urlDatabase, username: users[req.session.user_id]};
+  if (userChecker(req.session.user_id)) {
+    res.render('urls_index', templateVars);
+  } else {
+    res.render('login', templateVars);
+  }
 });
 
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect("/urls");
+  for (user in users) {
+    if (users[user].email === req.body.email && users[user].password ===req.body.password) {
+      req.session.user_id = users[user].id;
+      res.redirect('/');
+      return;
+    }
+  }
+  res.status(403).send('Username and/or Password do not match');
 });
 
 app.post("/logout", (req, res) => {
   res.clearCookie('username')
   res.clearCookie('password')
-  res.redirect("/");
+  res.redirect("/login");
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = {
-    username: req.cookies["username"],
-    urlDatabase: urlDatabase
-  };
-  res.render("urls_index", templateVars); 
+  console.log('req.session.user_id: ', req.session.user_id);
+  if (userChecker(req.session.user_id)) {
+    let templateVars = {urlDatabase: urlDatabase, username: users[req.session.user_id]};
+    console.log('new templateVars: ', templateVars);
+    res.render("urls_index", templateVars);
+  } else {
+    res.status(401).send('Error: 401: You are not authorized, Please <a href="/"> Login </a>');
+  }
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = {
-    username: req.cookies["username"],
-    shortUrl: req.params.id,
-    longUrl: urlDatabase[req.params.id]
-  };
-  res.render("urls_new", templateVars);
+  if (userChecker(req.session.user_id)) {
+    let templateVars = {urlDatabase: urlDatabase, username: users[req.session.user_id]};
+    res.render("urls_new", templateVars);
+  } else {
+    res.status(401).send('Error: 401: You are not authorized, Please <a href="/"> Login </a>');
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = {
-    username: req.cookies["username"],
-    shortUrl: req.params.id,
-    longUrl: urlDatabase[req.params.id]
-  };
+  let templateVars = {urlDatabase: urlDatabase, username: users[req.session.user_id]};
+  let shortUrl = req.params.id;
+  let longUrl = urlDatabase[shortUrl];
+  templateVars.shortUrl = shortUrl;
+  templateVars.longUrl = longUrl;
+  console.log("This is what app.get for urls/:id gives the following for urlDatabase[req.params.id]: " + urlDatabase[req.params.id] + "shortUrl: " + req.params.id);
   res.render("urls_show", templateVars);
 });
 

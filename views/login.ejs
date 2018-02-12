@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ./partials/_head %>
+</head>
+<body class="login">
+    <h3>
+      Welcome to TinyApp. Please login to continue.
+    </h3>
+      <p>
+        If you have never used TinyApp before, <a href="/register">please register</a>
+      </p>
+    <form action="/login" method="POST">
+      Email Address<br>
+      <input type="email" name="email" placeholder="" required="true">
+      <br>
+      Password<br>
+      <input type="password" name="password" placeholder="" required="true">
+      <br>
+      <button type="submit">Login</button>
+    </form>
+<footer>
+    <% include ./partials/_footer %>
+</footer>
+</body>
+</html>

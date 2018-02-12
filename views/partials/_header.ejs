@@ -2,7 +2,6 @@
 
 <nav class="navbar navbar-default" role="navigation">
 <div class="container-fluid">
-
     <div class="navbar-header">
         <a class="navbar-brand" href="/urls">
             TinyApp
@@ -13,22 +12,21 @@
         </ul>
     </div>
 
-    <% if (username) { %>
-        <div>
-            <p>Greetings, <%= username %> !</p>
-            <form action="/logout" method="POST"><button name="button">Sign out</button></form></td>
-            </form>
-        </div>
+    <% if (!username) { %>
+        <form action="/login" method="POST">
+        <button type="submit"><a href="/register">Register</a></button>
+        <button type="submit"><a href="/login">Login</a></button>
+    </form>
     <% } else { %>
         <div>
-            <form action="/login" method="POST">
-                <label for="username-field">Username:</label>
-                <input id="username-field" name="username">
-                <label for="password-field">Password:</label>
-                <input id="password-field" name="password" type="password">
-                <input type="submit" value="Sign in">
-            </form>
+            <p>Welcome, <%= username.email %> !</p>
         </div>
+        <div id="navbar-mylinks-logout">
+        <button type="button" name="button"><a href="/urls">My links</a></button>
+      <form action="/logout" method="POST">
+        <button type="submit">Logout</button>
+      </form>
+    </div>
     <% } %>
 </div>
 </nav>
