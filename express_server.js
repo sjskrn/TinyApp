@@ -22,20 +22,6 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-// const users = {
-//   "Jazz": {
-//     username: "Jazz",
-//     email: "Jazz@gmail.com",
-//     password: bcrypt.hashSync("hack3r", 10)
-//     // password: "pur"
-//   },
-//   "test": {
-//     username: "test",
-//     email: "test@gmail.com",
-//     password: bcrypt.hashSync("password", 10)
-//   }
-// };
-
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -59,9 +45,7 @@ console.log('user:', users);
 
 function doesUserEmailExist(email) {
   for (let user in users) {
-    //console.log('users[user]["email"]: ', users[user]['email']);
     if (users[user]['email'] === email) {
-    //console.log('doesUserEmailExist: ', email);
     return true;
     }
   }
@@ -105,6 +89,39 @@ app.get("/", (req, res) => {
     res.render('urls_index', templateVars);
   } else {
     res.render('login', templateVars);
+  }
+});
+
+app.get("/register", (req, res) => {
+  if (doesUserEmailExist(req.session.user_id)) {
+    res.redirect('/');
+  } res.render('register');
+});
+
+app.post("/register", (req, res) => {
+  console.log("Post params ", req.body);
+  if ((req.body.email === '') || (req.body.password === ''))
+    return res.status(400).send("Please enter a valid email and/or password");
+  else if (doesUserEmailExist(req.body.email) === false)
+    return res.status(400).send("User already exists!");
+  else {
+    let newUserKey = generateRandomString();
+    users[newUserKey] = {};
+    users[newUserKey].id = newUserKey;
+    users[newUserKey].email = req.body.email;
+    users[newUserKey].password = req.body.password;
+    res.cookie('user_id', newUserKey);
+    req.session['user_id'] = newUserKey;
+    return res.redirect("/");
+  }
+});
+
+app.get("/login", (req, res) => {
+let userId = req.session.user_id;
+  if (userId in users) {
+    res.redirect("/urls");
+  } else {
+    res.render("login");
   }
 });
 
