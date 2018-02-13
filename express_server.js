@@ -1,18 +1,17 @@
 const express = require("express");
-const bcrypt = require("bcrypt")
+// const bcrypt = require("bcrypt")
 const cookieParser = require('cookie-parser');
 const app = express();
 const cookieSession = require('cookie-session');
+const PORT = process.env.PORT || 8080;
+const bodyParser = require("body-parser");
 
-
+app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
   keys: [process.env.SECRET_KEY || 'dev']
 }));
 
-const PORT = process.env.PORT || 8080;
-
-const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs"); 
@@ -137,8 +136,9 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username')
-  res.clearCookie('password')
+  // res.clearCookie('username')
+  // res.clearCookie('password')
+  res.clearCookie('session'); 
   res.redirect("/login");
 });
 
