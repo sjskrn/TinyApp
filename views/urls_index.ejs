@@ -7,20 +7,30 @@
   <header>
     <% include ./partials/_header %>
   </header>
-    <table>
+    <table width="100%">
       <thead>
+        <tr><hr style="width:100%"></hr></tr>
         <tr>
-          <th>Short URL</th>
-          <th>Long URL</th>
+            <span style="float:left"></span>
+            <span class="noindex" style="float:right"></span>
+        </tr>
+        <br/>
+          <th>Tiny URL</th>
+          <!-- <th></th> -->
+          <th>Full URL</th>
           <th> </th>
         </tr>
       </thead>
       <tbody>
-        <% for (key in urlDatabase) {%>
+        <% for (let key in urlDatabase) {%>
         <tr>
-          <td><%= key %></td>
+          <td><a href="/u/<%= key %>"><%= key %></a></td>
           <td><%= urlDatabase[key] %></td>
-          <td><form method="POST" action="/urls/<%= key %>/delete"><a href="/urls/<%= key %>">Edit</a><button name="button">Delete</button></form></td>
+          <td>
+            <form method="POST" action="/urls/<%= key %>/delete">
+            <a href="/urls/<%= key %>">Edit</a>
+            <button name="button">Delete</button></form>
+          </td>
         </tr>
         <% } %>
       </tbody>

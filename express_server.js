@@ -157,6 +157,7 @@ app.get("/urls/new", (req, res) => {
   if (userChecker(req.session.user_id)) {
     let templateVars = {urlDatabase: urlDatabase, username: users[req.session.user_id]};
     res.render("urls_new", templateVars);
+    res.redirect("urls_index");
   } else {
     res.status(401).send('Error: 401: You are not authorized, Please <a href="/"> Login </a>');
   }
